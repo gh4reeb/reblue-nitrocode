@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./app/backend
+    container_name: reblue-backend
+    restart: always
+    env_file: .env
+    ports:
+      - "7051:5000"
+    depends_on:
+      - mongo
+    volumes:
+      - ./app/backend:/usr/src/app
+    networks:
+      - reblue-network
+
+  frontend:
+    build: ./app/frontend
+    container_name: reblue-frontend
+    restart: always
+    ports:
+      - "7055:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./app/frontend:/usr/src/app
+    networks:
+      - reblue-network
+
+  mongo:
+    image: mongo:5.0
+    container_name: reblue-mongo
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - reblue-network
+
+volumes:
+  mongo-data:
+
+networks:
+  reblue-network:
+    driver: bridge
