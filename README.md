@@ -26,8 +26,8 @@ ReBlue NitroCode is an open-source, one-click DevSecOps pipeline that integrates
 docker-compose up -d
 ```
 3. Access the application:
-```Frontend: http://localhost:3000```
-```Backend API: http://localhost:5000/api```
+```Frontend: http://localhost:7055```
+```Backend API: http://localhost:7050/api```
 
 ## Configuration
  Edit .env to modify API URLs, credentials, and environment settings.
