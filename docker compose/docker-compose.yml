@@ -1,0 +1,118 @@
+version: '3.8'
+
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+
+  gitea:
+    image: gitea/gitea:latest
+    container_name: gitea
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+      - "2222:22"
+    volumes:
+      - gitea_data:/data
+
+  sonarqube:
+    image: sonarqube:community
+    container_name: sonarqube
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    environment:
+      - SONARQUBE_JDBC_USERNAME=sonar 
+      - SONARQUBE_JDBC_PASSWORD=sonar #change to something very strong
+      - SONARQUBE_JDBC_URL=jdbc:postgresql://sonar-db:5432/sonarqube
+    depends_on:
+      - sonar-db
+
+  sonar-db:
+    image: postgres:15
+    container_name: sonar-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar #change to something very strong
+      - POSTGRES_DB=sonarqube
+    volumes:
+      - sonar_db_data:/var/lib/postgresql/data
+
+  zap:
+    image: owasp/zap2docker-stable
+    container_name: zap
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    entrypoint: ["zap.sh", "-daemon", "-port", "8090"]
+
+  vault:
+    image: hashicorp/vault
+    container_name: vault
+    restart: unless-stopped
+    ports:
+      - "8200:8200"
+    environment:
+      - VAULT_DEV_ROOT_TOKEN_ID=root
+      - VAULT_ADDR=http://0.0.0.0:8200
+    cap_add:
+      - IPC_LOCK
+
+  trivy:
+    image: aquasec/trivy
+    container_name: trivy
+    restart: unless-stopped
+    entrypoint: ["trivy", "--help"]
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin #change to something very strong
+    depends_on:
+      - prometheus
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.10.1
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.10.1
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+
+
+volumes:
+  jenkins_home:
+  gitea_data:
+  sonar_db_data:
