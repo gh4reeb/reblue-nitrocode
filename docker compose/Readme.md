@@ -21,8 +21,8 @@ cd devsecops-pipeline
 ```docker-compose up -d```
 
 ## Access the services:
-``Jenkins: http://localhost:8080``
-``Gitea: http://localhost:3000``
-``SonarQube: http://localhost:9000``
-``ZAP API: http://localhost:8090``
-``Vault: http://localhost:8200``
+``Jenkins: http://localhost:8080``  
+``Gitea: http://localhost:3000``  
+``SonarQube: http://localhost:9000``  
+``ZAP API: http://localhost:8090``  
+``Vault: http://localhost:8200``  
