@@ -9,7 +9,7 @@ JENKINS_TOKEN="${JENKINS_TOKEN:-admin}" # Replace with actual token or pass via 
 
 SCHEDULE_CRON=""
 OUTPUT_FILE="Jenkinsfile"
-
+s/djfasdjfja;sdlkjflksdj
 declare -A SECRETS
 declare -A CONFIG
 
